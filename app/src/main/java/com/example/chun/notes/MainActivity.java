@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         wireWidgets();
-        ListAdapter notesAdapter=new ArrayAdapter<Note>(this,R.layout.simple_list_item_1,notes);
+        ListAdapter notesAdapter=new ArrayAdapter<Note>(this,android.R.layout.simple_list_item_1,notes);
         notesListView.setAdapter(notesAdapter);
         notesListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 //extract the name, desc, and id of the one you clicked on
 
                 //make intent to open the new detail activity, putting extras
-                //Intent i = new Intent(MainActivity.this,adsfadsf.class);
-
-                //startActivity(i);
+//                Intent i = new Intent(MainActivity.this,adsfadsf.class);
+//
+//                startActivity(i);
             }
         });
 
