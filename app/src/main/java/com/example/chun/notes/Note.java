@@ -6,4 +6,5 @@ package com.example.chun.notes;
 
 public class Note {
     private String name,content;
+
 }

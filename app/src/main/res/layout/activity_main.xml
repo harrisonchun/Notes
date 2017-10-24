@@ -20,7 +20,7 @@
         app:srcCompat="@android:drawable/ic_menu_add" />
 
     <ListView
-        android:id="@+id/floatingActionButton_"
+        android:id="@+id/listview_notes"
         android:layout_width="231dp"
         android:layout_height="495dp"
         app:layout_constraintBottom_toBottomOf="parent"
