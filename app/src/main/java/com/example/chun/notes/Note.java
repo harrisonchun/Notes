@@ -1,5 +1,9 @@
 package com.example.chun.notes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +12,7 @@ import java.util.List;
  * Created by per6 on 10/20/17.
  */
 
-public class Note {
+public class Note implements Parcelable {
     private String name,content;
     private Date dateCreated, dateAccessed;
     private List<String> recentChanges;
@@ -66,4 +70,41 @@ public class Note {
         return null;
     }
 
+
+    protected Note(Parcel in) {
+        if (in.readByte() == 0x01) {
+            recentChanges = new ArrayList<String>();
+            in.readList(recentChanges, String.class.getClassLoader());
+        } else {
+            recentChanges = null;
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (recentChanges == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(recentChanges);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 }
