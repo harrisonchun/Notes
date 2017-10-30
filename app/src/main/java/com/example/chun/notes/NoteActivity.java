@@ -3,7 +3,6 @@ package com.example.chun.notes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -23,9 +22,6 @@ public class NoteActivity extends AppCompatActivity {
 
         Intent i = getIntent();//gets intent
         note=i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note from intent
-
-        Log.d(TAG, "onCreate: note Content received");//logs
-        Log.d(TAG, note.getName()+note.getContent());//logs
 
         nameText.setText(note.getName());
         contentText.setText(note.getContent());

@@ -3,6 +3,7 @@ package com.example.chun.notes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,93 +13,57 @@ import java.util.List;
  */
 
 public class Note implements Parcelable {
-    private String name,content;
-    private Date dateCreated, dateAccessed;
+    private StringBuffer name,content;
+    private StringBuffer dateCreated, dateAccessed;
     private List<String> recentChanges;
 
 
 
     public Note(String name, String content) {
-        this.name = name;
-        this.content = content;
-        dateCreated = new Date();
+        this.name = new StringBuffer(name);
+        this.content = new StringBuffer(content);
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
+        Date date = new Date();
+        dateCreated = new StringBuffer(dF.format(date));
         dateAccessed = null;
         recentChanges = new LinkedList();
     }
 
     public String toString(){
-        return "Created: "+dateCreated+", Content: "+content;
+        return name+ "\n"+dateCreated;
     }
 
-    public String getName() {
+    public StringBuffer getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(StringBuffer name) {
         this.name = name;
     }
 
-    public String getContent() {
+    public StringBuffer getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(StringBuffer content) {
         this.content = content;
     }
 
-    public Date getDateCreated() {
+    public StringBuffer getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(StringBuffer dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public Date getDateAccessed() {
+    public StringBuffer getDateAccessed() {
         return dateAccessed;
     }
 
-    public void setDateAccesed(Date dateAccessed) {
+    public void setDateAccessed(StringBuffer dateAccessed) {
         this.dateAccessed = dateAccessed;
     }
-
-
-//    protected Note(Parcel in) {
-//        if (in.readByte() == 0x01) {
-//            recentChanges = new ArrayList<String>();
-//            in.readList(recentChanges, String.class.getClassLoader());
-//        } else {
-//            recentChanges = null;
-//        }
-//    }
-//
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public void writeToParcel(Parcel dest, int flags) {
-//        if (recentChanges == null) {
-//            dest.writeByte((byte) (0x00));
-//        } else {
-//            dest.writeByte((byte) (0x01));
-//            dest.writeList(recentChanges);
-//        }
-//    }
-//
-//    @SuppressWarnings("unused")
-//    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
-//        @Override
-//        public Note createFromParcel(Parcel in) {
-//            return new Note(in);
-//        }
-//
-//        @Override
-//        public Note[] newArray(int size) {
-//            return new Note[size];
-//        }
-//    };
 
     @Override
     public int describeContents() {
@@ -107,20 +72,18 @@ public class Note implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.name);
-        dest.writeString(this.content);
-        dest.writeLong(this.dateCreated != null ? this.dateCreated.getTime() : -1);
-        dest.writeLong(this.dateAccessed != null ? this.dateAccessed.getTime() : -1);
+        dest.writeSerializable(this.name);
+        dest.writeSerializable(this.content);
+        dest.writeSerializable(this.dateCreated);
+        dest.writeSerializable(this.dateAccessed);
         dest.writeStringList(this.recentChanges);
     }
 
     protected Note(Parcel in) {
-        this.name = in.readString();
-        this.content = in.readString();
-        long tmpDateCreated = in.readLong();
-        this.dateCreated = tmpDateCreated == -1 ? null : new Date(tmpDateCreated);
-        long tmpDateAccessed = in.readLong();
-        this.dateAccessed = tmpDateAccessed == -1 ? null : new Date(tmpDateAccessed);
+        this.name = (StringBuffer) in.readSerializable();
+        this.content = (StringBuffer) in.readSerializable();
+        this.dateCreated = (StringBuffer) in.readSerializable();
+        this.dateAccessed = (StringBuffer) in.readSerializable();
         this.recentChanges = in.createStringArrayList();
     }
 

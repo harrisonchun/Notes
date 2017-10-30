@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this,NoteActivity.class);//create intent
                 i.putExtra(EXTRA_NOTE,notes.get(pos));//puts note into extra
 
-                Log.d(TAG, "onItemClick: notes position = "+pos);//logs
-                Log.d(TAG, notes.get(pos).getContent()+notes.get(pos).getName());//logs
+//                Log.d(TAG, "onItemClick: notes position = "+pos);//logs
+//                Log.d(TAG, notes.get(pos).getContent()+notes.get(pos).getName());//logs
 
                 startActivity(i);//start activity i
 
