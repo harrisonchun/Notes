@@ -29,7 +29,6 @@ public class NoteActivity extends AppCompatActivity {
         Intent i = getIntent();//gets intent
         note=i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note from intent
         note.setDateAccessed(new Date());
-        note.setName(new StringBuffer("untitled"+note.getDateCreated()));
         nameText.setText(note.getName());
         contentText.setText(note.getContent());
         contentText.addTextChangedListener(new TextWatcher() {

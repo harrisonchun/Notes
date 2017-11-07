@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this,NoteActivity.class);//create intent
-                i.putExtra(EXTRA_NOTE, new Note("Untitled",""));
+                i.putExtra(EXTRA_NOTE, new Note("Untitled " ,""));
                 startActivity(i);
             }
         });
