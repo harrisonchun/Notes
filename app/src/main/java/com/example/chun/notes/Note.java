@@ -61,8 +61,9 @@ public class Note implements Parcelable {
         return dateAccessed;
     }
 
-    public void setDateAccessed(StringBuffer dateAccessed) {
-        this.dateAccessed = dateAccessed;
+    public void setDateAccessed(Date dateAccessed) {
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
+        this.dateAccessed = new StringBuffer(dF.format(dateAccessed));
     }
 
     @Override
