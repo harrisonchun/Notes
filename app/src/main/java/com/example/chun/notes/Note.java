@@ -14,21 +14,21 @@ import java.util.List;
 
 public class Note implements Parcelable {
     private StringBuffer name,content;
-    private StringBuffer dateCreated, dateAccessed;
+    private Date dateCreated, dateAccessed;
     private List<String> recentChanges;
+    private SimpleDateFormat dF;
 
 
 
     public Note(String name, String content) {
         this.name = new StringBuffer(name);
         this.content = new StringBuffer(content);
-        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
-        Date date = new Date();
-        dateCreated = new StringBuffer(dF.format(date));
+        dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
+        dateCreated = new Date();
         dateAccessed = null;
         recentChanges = new LinkedList();
-        if (name.toString().equals("Untitled")){
-            this.name.insert(this.name.capacity()-1,dateCreated.toString());
+        if (name.toString().equals("Untitled ")){
+            this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateAccessed)).toString());
 
         }
     }
@@ -54,20 +54,15 @@ public class Note implements Parcelable {
     }
 
     public StringBuffer getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(StringBuffer dateCreated) {
-        this.dateCreated = dateCreated;
+        return new StringBuffer(dF.format(dateCreated));
     }
 
     public StringBuffer getDateAccessed() {
-        return dateAccessed;
+        return new StringBuffer(dF.format(dateAccessed));
     }
 
     public void setDateAccessed(Date dateAccessed) {
-        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
-        this.dateAccessed = new StringBuffer(dF.format(dateAccessed));
+        this.dateAccessed=dateAccessed;
     }
 
     @Override
@@ -87,8 +82,8 @@ public class Note implements Parcelable {
     protected Note(Parcel in) {
         this.name = (StringBuffer) in.readSerializable();
         this.content = (StringBuffer) in.readSerializable();
-        this.dateCreated = (StringBuffer) in.readSerializable();
-        this.dateAccessed = (StringBuffer) in.readSerializable();
+        this.dateCreated = (Date) in.readSerializable();
+        this.dateAccessed = (Date) in.readSerializable();
         this.recentChanges = in.createStringArrayList();
     }
 
