@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.EditText;
 
+
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -33,22 +34,30 @@ public class NoteActivity extends AppCompatActivity{
         wireWidgets();
 
         Intent i = getIntent();//gets intent
-        note = i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note from intent
+        String name = i.getStringExtra(MainActivity.EXTRA_NOTE);//gets note name from intent
+        if (readFromFile(name,this)!= null)
+        note = readFromFile(name, this);
+        else note = new Note("","");
         note.setDateAccessed(new Date());
         nameText.setText(note.getName());
         contentText.setText(note.getContent());
     }
 
 
+
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause: activity paused");
+        if (contentText.getText() != null)
         writeToFile(note, this);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        if (nameText.getText().length()>30){
+            note.setName(new StringBuffer(nameText.getText().toString().substring(0,29)));
+        }
         if (contentText.getText() != null) {
             Intent i = new Intent(NoteActivity.this, MainActivity.class);
             i.putExtra("Note", note);

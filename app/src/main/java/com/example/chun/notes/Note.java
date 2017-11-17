@@ -16,14 +16,14 @@ public class Note implements Parcelable {
     private StringBuffer name,content;
     private Date dateCreated, dateAccessed;
     private List<String> recentChanges;
-    private SimpleDateFormat dF;
+    //private SimpleDateFormat dF;
 
 
 
     public Note(String name, String content) {
         this.name = new StringBuffer(name);
         this.content = new StringBuffer(content);
-        dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
         dateCreated = new Date();
         dateAccessed = null;
         recentChanges = new LinkedList();
@@ -54,10 +54,12 @@ public class Note implements Parcelable {
     }
 
     public StringBuffer getDateCreated() {
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
         return new StringBuffer(dF.format(dateCreated));
     }
 
     public StringBuffer getDateAccessed() {
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
         return new StringBuffer(dF.format(dateAccessed));
     }
 

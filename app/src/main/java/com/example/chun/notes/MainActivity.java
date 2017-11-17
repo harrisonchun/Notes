@@ -38,9 +38,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         wireWidgets();
-        notes=new ArrayList<>();
-        //notes.add(new Note("Sample","" + "This is a sample note."));
 
+        notes = new ArrayList<>();
+        Note SampleNote = new Note("Sample","" + "This is a sample note.");
+        //notes = readFromFile("StringDirectory_ja7aIlbmy663G87dk.txt",this);
+        notes.add(SampleNote.getName().toString());
         notesAdapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notes);
         notesListView.setAdapter(notesAdapter);
 
@@ -70,6 +72,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        Gson gson = new Gson();
+        String noteJson = gson.toJson(notes);
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("StringDirectory_ja7aIlbmy663G87dk.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(noteJson);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == NoteActivity.OK){
             Note n = data.getParcelableExtra("Note");
@@ -95,12 +112,13 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-    private Note readFromFile(String name, Context context) {
+
+    private ArrayList readFromFile(String name, Context context) {
         Gson gson = new Gson();
         String text = "";
 
         try {
-            InputStream inputStream = context.openFileInput(name+".txt");
+            InputStream inputStream = context.openFileInput("StringDirectory_ja7aIlbmy663G87dk.txt");
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -121,9 +139,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e("login activity", "Can not read file: " + e.toString());
         }
-        Note noteJson = gson.fromJson(text,Note.class);
+        ArrayList<String> notes = (ArrayList<String>) gson.fromJson(text,List.class);
 
-        return noteJson;
+        return notes;
     }
-
 }
