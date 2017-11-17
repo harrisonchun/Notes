@@ -4,16 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity{
 
     private Note note;
     private EditText contentText, nameText;
@@ -39,6 +43,7 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause: activity paused");
+        writeToFile(note, this);
         super.onPause();
     }
 
@@ -49,7 +54,50 @@ public class NoteActivity extends AppCompatActivity {
             i.putExtra("Note", note);
             setResult(OK, i);
         } else setResult(CANCELLED);
+        writeToFile(note, this);
         super.onDestroy();
+    }
+    private void writeToFile(Note a, Context context) {
+        Gson gson = new Gson();
+        String noteJson = gson.toJson(a);
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getName()+".txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(noteJson);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+    private Note readFromFile(String name, Context context) {
+        Gson gson = new Gson();
+        String text = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(name+".txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                text = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+        Note noteJson = gson.fromJson(text,Note.class);
+
+        return noteJson;
     }
 
     private void wireWidgets() {

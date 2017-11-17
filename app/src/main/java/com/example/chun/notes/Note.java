@@ -28,7 +28,7 @@ public class Note implements Parcelable {
         dateAccessed = null;
         recentChanges = new LinkedList();
         if (name.toString().equals("Untitled ")){
-            this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateAccessed)).toString());
+            this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateCreated)).toString());
 
         }
     }
