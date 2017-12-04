@@ -1,35 +1,33 @@
 package com.example.chun.notes;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.google.gson.Gson;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_NOTE="note";
     public static final String TAG="MainActivity";
     public static final int NEW_NOTE_REQUEST = 1;
-    private List<String> notes;
+    private List<Note> notes;
     private FloatingActionButton addNewNoteButton;
     private ListView notesListView;
-    private ArrayAdapter<String> notesAdapter;
+    private ArrayAdapter<Note> notesAdapter;
 
 
     @Override
@@ -38,13 +36,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         wireWidgets();
+        notes=new ArrayList<Note>();
+        notes.add(new Note("Sample B","This is a sample note."));
+        notes.add(new Note("Sample A","This is a sample note."));
 
-        notes = new ArrayList<>();
-        Note SampleNote = new Note("Sample","" + "This is a sample note.");
-        //notes = readFromFile("StringDirectory_ja7aIlbmy663G87dk.txt",this);
-        notes.add(SampleNote.getName().toString());
-        notesAdapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notes);
+        notesAdapter=new ArrayAdapter<Note>(this, android.R.layout.simple_list_item_1,notes);
         notesListView.setAdapter(notesAdapter);
+        registerForContextMenu(notesListView);
 
         notesListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
@@ -72,25 +70,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        Gson gson = new Gson();
-        String noteJson = gson.toJson(notes);
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("StringDirectory_ja7aIlbmy663G87dk.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(noteJson);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-        super.onDestroy();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == NoteActivity.OK){
             Note n = data.getParcelableExtra("Note");
-            writeToFile(n,this);
+            notes.add(n);
             notesAdapter.notifyDataSetChanged();
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -100,47 +83,75 @@ public class MainActivity extends AppCompatActivity {
         addNewNoteButton=(FloatingActionButton)findViewById(R.id.floatingActionButton_new_note);
         notesListView=(ListView)findViewById(R.id.listview_notes);
     }
-    private void writeToFile(Note a, Context context) {
-        Gson gson = new Gson();
-        String noteJson = gson.toJson(a);
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getName()+".txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(noteJson);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            //case R.id.menu_sort:
+            case R.id.sort_by_accessed:
+                sortByAccessed();
+                return true;
+            case R.id.sort_by_created:
+                sortByCreated();
+                return true;
+            case R.id.sort_by_name:
+                sortByName();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
-    private ArrayList readFromFile(String name, Context context) {
-        Gson gson = new Gson();
-        String text = "";
 
-        try {
-            InputStream inputStream = context.openFileInput("StringDirectory_ja7aIlbmy663G87dk.txt");
 
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
 
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
 
-                inputStream.close();
-                text = stringBuilder.toString();
+
+    private void sortByName() {
+        Collections.sort(notes, new Comparator<Note>() {
+            @Override
+            public int compare(Note note, Note t1) {
+                return note.getName().toString().compareToIgnoreCase(t1.getName().toString());
             }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-        ArrayList<String> notes = (ArrayList<String>) gson.fromJson(text,List.class);
-
-        return notes;
+        });
+        notesAdapter.notifyDataSetChanged();
+        Log.d(TAG, "Sorted by name");
     }
+    private void sortByCreated() {
+//        Collections.sort(notes, new Comparator<Note>() {
+//            @Override
+//            public int compare(Note note, Note t1) {
+//                return note.getDateCreated().compareTo(t1.getDateCreated());
+//            }
+//        });
+//        notesAdapter.notifyDataSetChanged();
+        Log.d(TAG, "Sorted by date created");
+    }
+    private void sortByAccessed() {
+//        boolean noNull=true;
+//        for (Note note:notes){
+//            if (note.getDateAccessed()==null){noNull = false;}
+//        }
+//        if (noNull) {
+            Collections.sort(notes, new Comparator<Note>() {
+                @Override
+                public int compare(Note note, Note t1) {
+                    return note.getDateAccessed().
+                    Log.d(TAG, "compare: ");
+                }
+            });
+            notesAdapter.notifyDataSetChanged();
+            Log.d(TAG, "Sorted by last accessed");
+            
+        }
+//    }
+
 }
