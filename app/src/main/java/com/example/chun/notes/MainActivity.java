@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_NOTE="note";
@@ -37,12 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
         wireWidgets();
         notes=new ArrayList<Note>();
-        notes.add(new Note("Sample B","This is a sample note."));
-        notes.add(new Note("Sample A","This is a sample note."));
+        notes.add(new Note("SampleA","This is a sample note."));
+        notes.add(new Note("SampleB","This is a sample note."));
+
 
         notesAdapter=new ArrayAdapter<Note>(this, android.R.layout.simple_list_item_1,notes);
         notesListView.setAdapter(notesAdapter);
-        registerForContextMenu(notesListView);
 
         notesListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
@@ -126,32 +124,30 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Sorted by name");
     }
     private void sortByCreated() {
-//        Collections.sort(notes, new Comparator<Note>() {
-//            @Override
-//            public int compare(Note note, Note t1) {
-//                return note.getDateCreated().compareTo(t1.getDateCreated());
-//            }
-//        });
-//        notesAdapter.notifyDataSetChanged();
+
+        Collections.sort(notes, new Comparator<Note>() {
+            @Override
+            public int compare(Note note, Note t1) {
+                return (note.getDateCreated().compareTo(t1.getDateCreated()))*(-1);
+            }
+        });
+        notesAdapter.notifyDataSetChanged();
         Log.d(TAG, "Sorted by date created");
     }
     private void sortByAccessed() {
-//        boolean noNull=true;
-//        for (Note note:notes){
-//            if (note.getDateAccessed()==null){noNull = false;}
-//        }
-//        if (noNull) {
             Collections.sort(notes, new Comparator<Note>() {
+
                 @Override
                 public int compare(Note note, Note t1) {
-                    return note.getDateAccessed().
-                    Log.d(TAG, "compare: ");
+                    for (Note n :notes){
+                        if (n.getDateAccessed()==null){n.setDateAccessed(n.getDateCreated());}
+                    }
+                    return note.getDateAccessed().compareTo(t1.getDateAccessed());
                 }
             });
             notesAdapter.notifyDataSetChanged();
             Log.d(TAG, "Sorted by last accessed");
-            
+
         }
-//    }
 
 }
