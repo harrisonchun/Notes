@@ -24,13 +24,13 @@ public class Note implements Parcelable {
     public Note(String name, String content) {
         this.name = new StringBuffer(name);
         this.content = new StringBuffer(content);
-        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aa");
         dateCreated = new Date();
         dateAccessed = null;
         recentChanges = new LinkedList();
         if (name.toString().equals("Untitled")){
-            this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateCreated)).toString());
-            title = this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateCreated)).toString());
+            this.name.insert(this.name.length()," "+ new StringBuffer(dF.format(dateCreated)).toString());
+            title = this.name;
         }
     }
 
@@ -58,14 +58,12 @@ public class Note implements Parcelable {
         this.content = content;
     }
 
-    public StringBuffer getDateCreated() {
-        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
-        return new StringBuffer(dF.format(dateCreated));
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public StringBuffer getDateAccessed() {
-        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aaa");
-        return new StringBuffer(dF.format(dateAccessed));
+    public Date getDateAccessed() {
+        return dateAccessed;
     }
 
     public void setDateAccessed(Date dateAccessed) {
