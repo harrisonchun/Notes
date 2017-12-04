@@ -16,6 +16,7 @@ public class Note implements Parcelable {
     private StringBuffer name,content;
     private Date dateCreated, dateAccessed;
     private List<String> recentChanges;
+    private StringBuffer title;
     //private SimpleDateFormat dF;
 
 
@@ -27,9 +28,9 @@ public class Note implements Parcelable {
         dateCreated = new Date();
         dateAccessed = null;
         recentChanges = new LinkedList();
-        if (name.toString().equals("Untitled ")){
+        if (name.toString().equals("Untitled")){
             this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateCreated)).toString());
-
+            title = this.name.insert(this.name.length()-1," "+ new StringBuffer(dF.format(dateCreated)).toString());
         }
     }
 
@@ -39,6 +40,10 @@ public class Note implements Parcelable {
 
     public StringBuffer getName() {
         return name;
+    }
+
+    public StringBuffer getTitle() {
+        return title;
     }
 
     public void setName(StringBuffer name) {
@@ -75,6 +80,7 @@ public class Note implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeSerializable(this.name);
+        dest.writeSerializable(this.title);
         dest.writeSerializable(this.content);
         dest.writeSerializable(this.dateCreated);
         dest.writeSerializable(this.dateAccessed);
@@ -83,6 +89,7 @@ public class Note implements Parcelable {
 
     protected Note(Parcel in) {
         this.name = (StringBuffer) in.readSerializable();
+        this.title = (StringBuffer) in.readSerializable();
         this.content = (StringBuffer) in.readSerializable();
         this.dateCreated = (Date) in.readSerializable();
         this.dateAccessed = (Date) in.readSerializable();
