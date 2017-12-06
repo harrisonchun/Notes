@@ -2,11 +2,17 @@ package com.example.chun.notes;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.EditText;
-
 
 import com.google.gson.Gson;
 
@@ -19,7 +25,6 @@ import java.io.OutputStreamWriter;
 import java.util.Date;
 
 public class NoteActivity extends AppCompatActivity{
-
     private Note note;
     private EditText contentText, nameText;
     public static final String TAG = "NoteActivity";
@@ -43,7 +48,64 @@ public class NoteActivity extends AppCompatActivity{
         contentText.setText(note.getContent());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options, menu);
+        return true;
+    }
 
+    private void wireWidgets() {
+        nameText = findViewById(R.id.edittext_nametext);
+        contentText = findViewById(R.id.edittext_notetext);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.italics_button:
+                italic();
+                return true;
+            case R.id.bold_button:
+                bold();
+                return true;
+            case R.id.underline_button:
+                underline();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void bold(){
+        int startSelection = contentText.getSelectionStart();
+        int endSelection = contentText.getSelectionEnd();
+        if (startSelection == endSelection) {contentText.setTypeface(Typeface.DEFAULT_BOLD);}
+        else{
+        SpannableString contentString = SpannableString.valueOf(contentText.getText());
+        contentString.setSpan(new StyleSpan(Typeface.BOLD), startSelection, endSelection, 0);
+        contentText.setText(contentString);
+        contentText.setSelection(endSelection   );}
+    }
+
+    private void italic(){
+        int startSelection = contentText.getSelectionStart();
+        int endSelection = contentText.getSelectionEnd();
+        SpannableString contentString = SpannableString.valueOf(contentText.getText());
+        contentString.setSpan(new StyleSpan(Typeface.ITALIC), startSelection, endSelection, 0);
+        contentText.setText(contentString);
+        contentText.setSelection(endSelection   );
+    }
+
+    private void underline(){
+        int startSelection = contentText.getSelectionStart();
+        int endSelection = contentText.getSelectionEnd();
+        SpannableString contentString = SpannableString.valueOf(contentText.getText());
+        contentString.setSpan(new UnderlineSpan(), startSelection, endSelection, 0);
+        contentText.setText(contentString);
+        contentText.setSelection(endSelection   );
+    }
 
     @Override
     protected void onPause() {
@@ -66,6 +128,7 @@ public class NoteActivity extends AppCompatActivity{
         writeToFile(note, this);
         super.onDestroy();
     }
+
     private void writeToFile(Note a, Context context) {
         Gson gson = new Gson();
         String noteJson = gson.toJson(a);
@@ -78,6 +141,7 @@ public class NoteActivity extends AppCompatActivity{
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
+
     private Note readFromFile(String name, Context context) {
         Gson gson = new Gson();
         String text = "";
@@ -107,11 +171,6 @@ public class NoteActivity extends AppCompatActivity{
         Note noteJson = gson.fromJson(text,Note.class);
 
         return noteJson;
-    }
-
-    private void wireWidgets() {
-        nameText = findViewById(R.id.edittext_nametext);
-        contentText = findViewById(R.id.edittext_notetext);
     }
 }
 
