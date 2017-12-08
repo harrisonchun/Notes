@@ -30,7 +30,7 @@ public class Note implements Parcelable {
         recentChanges = new LinkedList();
         if (name.toString().equals("Untitled")){
             this.name.insert(this.name.length()," "+ new StringBuffer(dF.format(dateCreated)).toString());
-            title = this.name;
+            title = new StringBuffer(this.name.toString().toLowerCase().replace(":","").replace(" ","_").replace(",",""));
         }
     }
 
@@ -40,6 +40,11 @@ public class Note implements Parcelable {
 
     public StringBuffer getName() {
         return name;
+    }
+
+    public void setTitle() {
+        SimpleDateFormat dF = new SimpleDateFormat("MMM dd, yyyy hh:mm aa");
+        title = new StringBuffer(new StringBuffer(name).insert(this.name.length()," "+ new StringBuffer(dF.format(dateCreated)).toString()).toString().toLowerCase().replace(":","").replace(" ","_"));
     }
 
     public StringBuffer getTitle() {

@@ -27,9 +27,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG="MainActivity";
     public static final int NEW_NOTE_REQUEST = 1;
     private List<String> notes;
+    private List<Note> notesList;
     private FloatingActionButton addNewNoteButton;
     private ListView notesListView;
-    private ArrayAdapter<String> notesAdapter;
+    private ArrayAdapter<Note> notesAdapter;
 
 
     @Override
@@ -38,12 +39,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         wireWidgets();
-
         notes = new ArrayList<>();
+        notesList = new ArrayList<>();
         Note SampleNote = new Note("Sample","" + "This is a sample note.");
-        //notes = readFromFile("StringDirectory_ja7aIlbmy663G87dk.txt",this);
-        notes.add(SampleNote.getName().toString());
-        notesAdapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notes);
+        //SampleNote.setTitle();
+        notes = readFromFile("stringdirectory_ja7abmy663g87dk.txt",this);
+        //notesList.add(SampleNote);
+        //notes.add(SampleNote.getTitle().toString());
+        fillNotesList();
+
+        notesAdapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notesList);
         notesListView.setAdapter(notesAdapter);
 
         notesListView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -52,12 +57,12 @@ public class MainActivity extends AppCompatActivity {
                                     int pos, long l) {
 
                 Intent i = new Intent(MainActivity.this,NoteActivity.class);//create intent
-                i.putExtra(EXTRA_NOTE,notes.get(pos));//puts note into extra
+                i.putExtra(EXTRA_NOTE,notesList.get(pos));//puts note into extra
 
 //                Log.d(TAG, "onItemClick: notes position = "+pos);//logs
 //                Log.d(TAG, notes.get(pos).getContent()+notes.get(pos).getName());//logs
 
-                startActivity(i);//start activity i
+                startActivityForResult(i,1);//start activity i
 
             }
         });
@@ -65,20 +70,58 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, NoteActivity.class);//create intent
-                i.putExtra(EXTRA_NOTE, new Note("Untitled " ,""));
-                startActivityForResult(i, NEW_NOTE_REQUEST);
+                i.putExtra(EXTRA_NOTE, new Note("Untitled" ,""));
+                startActivityForResult(i, 1);
             }
         });
     }
+
+    private void fillNotesList() {
+        for (String n : notes){
+            Gson gson = new Gson();
+            String text;
+            try {
+                InputStream inputStream = this.openFileInput(n+".txt");
+
+                if ( inputStream != null ) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    String receiveString;
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    while ( (receiveString = bufferedReader.readLine()) != null ) {
+                        stringBuilder.append(receiveString);
+                    }
+
+                    inputStream.close();
+                    text = stringBuilder.toString();
+                    if (text.equals("")==false){
+                        Note noteFromJson = gson.fromJson(text,Note.class);
+                        notesList.add(noteFromJson);
+                    }
+                }
+            }
+            catch (FileNotFoundException e) {
+                Log.e("login activity", "File not found: " + e.toString());
+            } catch (IOException e) {
+                Log.e("login activity", "Can not read file: " + e.toString());
+            }
+            catch (NullPointerException e) {
+                Log.e(TAG, "fillNotesList: " + e.toString());
+            }
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
         Gson gson = new Gson();
         String noteJson = gson.toJson(notes);
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("StringDirectory_ja7aIlbmy663G87dk.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("stringdirectory_ja7abmy663g87dk.txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(noteJson);
             outputStreamWriter.close();
+            Log.d(TAG, "onDestroy: "+noteJson);
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
@@ -88,24 +131,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NoteActivity.OK){
+        Log.d(TAG, "onActivityResult: result code "+resultCode + " request code "+ requestCode + " data "+data);
+        if (resultCode == RESULT_OK){
             Note n = data.getParcelableExtra("Note");
             writeToFile(n,this);
+            if (!notes.contains(n.getTitle().toString())){
+            notes.add(n.getTitle().toString());
+            Log.d(TAG, "onActivityResult: "+notes.add(n.getTitle().toString()));
+            }
             notesAdapter.notifyDataSetChanged();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void wireWidgets() {
-        addNewNoteButton=(FloatingActionButton)findViewById(R.id.floatingActionButton_new_note);
-        notesListView=(ListView)findViewById(R.id.listview_notes);
+        addNewNoteButton=findViewById(R.id.floatingActionButton_new_note);
+        notesListView=findViewById(R.id.listview_notes);
     }
     private void writeToFile(Note a, Context context) {
         Gson gson = new Gson();
         String noteJson = gson.toJson(a);
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getName()+".txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getTitle()+".txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(noteJson);
+            Log.d(TAG, "writeToFile: "+noteJson);
             outputStreamWriter.close();
         }
         catch (IOException e) {
@@ -114,11 +163,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList readFromFile(String name, Context context) {
+    //private String readFromFile(String name, Context context) {
         Gson gson = new Gson();
         String text = "";
 
         try {
-            InputStream inputStream = context.openFileInput("StringDirectory_ja7aIlbmy663G87dk.txt");
+            InputStream inputStream = context.openFileInput("stringdirectory_ja7aIlbmy663G87dk.txt");
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -140,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("login activity", "Can not read file: " + e.toString());
         }
         ArrayList<String> notes = (ArrayList<String>) gson.fromJson(text,List.class);
-
+        //return text;
         return notes;
     }
 }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 
@@ -23,8 +25,6 @@ public class NoteActivity extends AppCompatActivity{
     private Note note;
     private EditText contentText, nameText;
     public static final String TAG = "NoteActivity";
-    public static final int OK = 2;
-    public static final int CANCELLED = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,80 +34,107 @@ public class NoteActivity extends AppCompatActivity{
         wireWidgets();
 
         Intent i = getIntent();//gets intent
-        String name = i.getStringExtra(MainActivity.EXTRA_NOTE);//gets note name from intent
-        if (readFromFile(name,this)!= null)
-        note = readFromFile(name, this);
-        else note = new Note("","");
+        note = i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note name from intent
+//        if (readFromFile(name,this)!= null)
+//        note = readFromFile(name, this);
+//        else note = new Note("","");
         note.setDateAccessed(new Date());
         nameText.setText(note.getName());
         contentText.setText(note.getContent());
+        ((Button)findViewById(R.id.back)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                note.setContent(new StringBuffer(contentText.getText().toString()));
+                note.setName(new StringBuffer(nameText.getText().toString()));
+                if (nameText.getText().toString().length()>30){
+                    note.setName(new StringBuffer(nameText.getText().toString().substring(0,29)));
+                }
+                if (contentText.getText().toString().length()>0) {
+                    Log.d(TAG, "onPause: "+note.toString());
+                    Intent i = new Intent();
+                    i.putExtra("Note", note);
+                    setResult(RESULT_OK, i);
+                    writeToFile(note, NoteActivity.this);
+                    Log.d(TAG, "onPause: after finish statement");
+                    finish();
+                } else {
+                    Log.d(TAG, "onPause: else statement");
+                    setResult(RESULT_CANCELED);
+                }
+            }
+        });
+
+
     }
 
 
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause: activity paused");
-        if (contentText.getText() != null)
-        writeToFile(note, this);
+        note.setContent(new StringBuffer(contentText.getText().toString()));
+        note.setName(new StringBuffer(nameText.getText().toString()));
+        if (nameText.getText().toString().length()>30){
+            note.setName(new StringBuffer(nameText.getText().toString().substring(0,29)));
+        }
+        if (contentText.getText().toString().length()>0) {
+            Log.d(TAG, "onPause: "+note.toString());
+            Intent i = new Intent();
+            i.putExtra("Note", note);
+            setResult(RESULT_OK, i);
+            writeToFile(note, NoteActivity.this);
+            Log.d(TAG, "onPause: after finish statement");
+            finish();
+        } else {
+            Log.d(TAG, "onPause: else statement");
+            setResult(RESULT_CANCELED);
+        }
         super.onPause();
     }
 
-    @Override
-    protected void onDestroy() {
-        if (nameText.getText().length()>30){
-            note.setName(new StringBuffer(nameText.getText().toString().substring(0,29)));
-        }
-        if (contentText.getText() != null) {
-            Intent i = new Intent(NoteActivity.this, MainActivity.class);
-            i.putExtra("Note", note);
-            setResult(OK, i);
-        } else setResult(CANCELLED);
-        writeToFile(note, this);
-        super.onDestroy();
-    }
+
     private void writeToFile(Note a, Context context) {
         Gson gson = new Gson();
         String noteJson = gson.toJson(a);
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getName()+".txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(a.getTitle()+".txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(noteJson);
             outputStreamWriter.close();
+            Log.d(TAG, "writeToFile: write successful: "  + noteJson);
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-    private Note readFromFile(String name, Context context) {
-        Gson gson = new Gson();
-        String text = "";
-
-        try {
-            InputStream inputStream = context.openFileInput(name+".txt");
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                text = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-        Note noteJson = gson.fromJson(text,Note.class);
-
-        return noteJson;
-    }
+//    private Note readFromFile(String name, Context context) {
+//        Gson gson = new Gson();
+//        String text = "";
+//
+//        try {
+//            InputStream inputStream = context.openFileInput(name+".txt");
+//
+//            if ( inputStream != null ) {
+//                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+//                String receiveString = "";
+//                StringBuilder stringBuilder = new StringBuilder();
+//
+//                while ( (receiveString = bufferedReader.readLine()) != null ) {
+//                    stringBuilder.append(receiveString);
+//                }
+//
+//                inputStream.close();
+//                text = stringBuilder.toString();
+//            }
+//        }
+//        catch (FileNotFoundException e) {
+//            Log.e("login activity", "File not found: " + e.toString());
+//        } catch (IOException e) {
+//            Log.e("login activity", "Can not read file: " + e.toString());
+//        }
+//        Note noteJson = gson.fromJson(text,Note.class);
+//
+//        return noteJson;
+//    }
 
     private void wireWidgets() {
         nameText = findViewById(R.id.edittext_nametext);
