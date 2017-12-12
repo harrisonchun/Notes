@@ -11,10 +11,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,11 +45,16 @@ public class MainActivity extends AppCompatActivity {
         wireWidgets();
         notes = new ArrayList<>();
         notesList = new ArrayList<>();
-        Note SampleNote = new Note("Sample","" + "This is a sample note.");
-        //SampleNote.setTitle();
+        Log.d(TAG, "onCreate: " + !fileExist("stringdirectory_ja7abmy663g87dk.txt"));
+        if(!fileExist("stringdirectory_ja7abmy663g87dk.txt")){
+            fileNoExist("stringdirectory_ja7abmy663g87dk.txt",R.raw.stringdirectory_ja7abmy663g87dk);
+        }
+        if(!fileExist("sample_dec_06_2017_0148_pm.txt")){
+            fileNoExist("sample_dec_06_2017_0148_pm.txt", R.raw.sample_dec_06_2017_0148_pm);
+        }
         notes = readFromFile("stringdirectory_ja7abmy663g87dk.txt",this);
-        //notesList.add(SampleNote);
-        //notes.add(SampleNote.getTitle().toString());
+        Log.d(TAG, "onCreate: "+notes);
+
         fillNotesList();
 
         notesAdapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notesList);
@@ -58,10 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent i = new Intent(MainActivity.this,NoteActivity.class);//create intent
                 i.putExtra(EXTRA_NOTE,notesList.get(pos));//puts note into extra
-
-//                Log.d(TAG, "onItemClick: notes position = "+pos);//logs
-//                Log.d(TAG, notes.get(pos).getContent()+notes.get(pos).getName());//logs
-
                 startActivityForResult(i,1);//start activity i
 
             }
@@ -76,12 +81,43 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void fileNoExist(String name,int res) {
+        String noteJson="";
+        Gson gson = new Gson();
+        try {
+            InputStream is = this.getResources().openRawResource(res);
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader bufferedReader = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            while ((noteJson = bufferedReader.readLine()) != null) {
+                sb.append(noteJson);
+            }
+            noteJson = sb.toString();
+            Log.d(TAG, "fileNoExist: "+noteJson);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput(name, Context.MODE_PRIVATE));
+            outputStreamWriter.write(noteJson);
+            outputStreamWriter.close();
+
+//            String yourFilePath = this.getFilesDir() + "/" + name;
+//            File yourFile = new File( yourFilePath );
+//            FileOutputStream fileOutputStream = new FileOutputStream(yourFile);
+//            fileOutputStream.write(noteJson.getBytes());
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File No Exist File write failed: " + e.toString());
+        }
+    }
+
     private void fillNotesList() {
         for (String n : notes){
             Gson gson = new Gson();
             String text;
             try {
-                InputStream inputStream = this.openFileInput(n+".txt");
+                String yourFilePath = this.getFilesDir() + "/" + n+".txt";
+                File yourFile = new File( yourFilePath );
+                FileInputStream inputStream = new FileInputStream(yourFile);
 
                 if ( inputStream != null ) {
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -102,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             catch (FileNotFoundException e) {
-                Log.e("login activity", "File not found: " + e.toString());
+                Log.e("login activity", "fillNotesList File not found: " + e.toString());
             } catch (IOException e) {
                 Log.e("login activity", "Can not read file: " + e.toString());
             }
@@ -118,9 +154,15 @@ public class MainActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String noteJson = gson.toJson(notes);
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("stringdirectory_ja7abmy663g87dk.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(noteJson);
-            outputStreamWriter.close();
+            String yourFilePath = this.getFilesDir() + "/" + "stringdirectory_ja7abmy663g87dk.txt";
+            File yourFile = new File( yourFilePath );
+//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(this.openFileOutput("stringdirectory_ja7abmy663g87dk.txt", Context.MODE_PRIVATE));
+//            outputStreamWriter.write(noteJson);
+//            outputStreamWriter.close();
+            FileOutputStream fileOutputStream = new FileOutputStream(yourFile);
+            fileOutputStream.write(noteJson.getBytes());
+            fileOutputStream.flush();
+            fileOutputStream.close();
             Log.d(TAG, "onDestroy: "+noteJson);
         }
         catch (IOException e) {
@@ -148,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         addNewNoteButton=findViewById(R.id.floatingActionButton_new_note);
         notesListView=findViewById(R.id.listview_notes);
     }
+
     private void writeToFile(Note a, Context context) {
         Gson gson = new Gson();
         String noteJson = gson.toJson(a);
@@ -156,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
             outputStreamWriter.write(noteJson);
             Log.d(TAG, "writeToFile: "+noteJson);
             outputStreamWriter.close();
+            notes.clear();
+            fillNotesList();
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
@@ -163,18 +208,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList readFromFile(String name, Context context) {
-    //private String readFromFile(String name, Context context) {
         Gson gson = new Gson();
         String text = "";
 
         try {
-            InputStream inputStream = context.openFileInput("stringdirectory_ja7aIlbmy663G87dk.txt");
+            String yourFilePath = context.getFilesDir() + "/" + name;
+            File yourFile = new File( yourFilePath );
+            InputStream inputStream = new FileInputStream(yourFile);
+            StringBuilder stringBuilder = new StringBuilder();
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
 
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
                     stringBuilder.append(receiveString);
@@ -182,15 +228,21 @@ public class MainActivity extends AppCompatActivity {
 
                 inputStream.close();
                 text = stringBuilder.toString();
+                Log.d(TAG, "readFromFile: "+text);
             }
         }
         catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
+            Log.e("login activity", "readFromFile File not found: " + e.toString());
         } catch (IOException e) {
             Log.e("login activity", "Can not read file: " + e.toString());
         }
         ArrayList<String> notes = (ArrayList<String>) gson.fromJson(text,List.class);
-        //return text;
         return notes;
     }
+
+    public boolean fileExist(String fname){
+        File file = getBaseContext().getFileStreamPath(fname);
+        return file.exists();
+    }
+
 }
