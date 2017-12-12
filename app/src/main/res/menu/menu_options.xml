@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bold_button"
+        android:title="B"
+        app:showAsAction="always"
+        android:visible="true"/>
+    <item
+        android:id="@+id/italics_button"
+        android:title="I"
+        app:showAsAction="always"
+        android:visible="true"/>
+    <item
+        android:id="@+id/underline_button"
+        android:title="U"
+        app:showAsAction="always"
+        android:visible="true"/>
+</menu>

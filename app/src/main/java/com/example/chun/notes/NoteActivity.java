@@ -30,7 +30,7 @@ public class NoteActivity extends AppCompatActivity{
     public static final String TAG = "NoteActivity";
     public static final int OK = 2;
     public static final int CANCELLED = 3;
-
+// yeet
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
