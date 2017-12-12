@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Notes</string>
+    <string name="sort_by_name">Sort By Name</string>
+    <string name="sort_by_created">Sort By Date Created</string>
+    <string name="sort_by_accessed">Sort By Date Accessed</string>
+    <string name="sort">Sort</string>
+
 </resources>
