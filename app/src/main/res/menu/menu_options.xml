@@ -5,16 +5,13 @@
     <item
         android:id="@+id/bold_button"
         android:title="B"
-        app:showAsAction="always"
-        android:visible="true"/>
+        app:showAsAction="always"/>
     <item
         android:id="@+id/italics_button"
         android:title="I"
-        app:showAsAction="always"
-        android:visible="true"/>
+        app:showAsAction="always"/>
     <item
         android:id="@+id/underline_button"
         android:title="U"
-        app:showAsAction="always"
-        android:visible="true"/>
+        app:showAsAction="always"/>
 </menu>
