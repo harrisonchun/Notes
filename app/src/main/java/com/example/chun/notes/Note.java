@@ -17,8 +17,6 @@ public class Note implements Parcelable {
     private Date dateCreated, dateAccessed;
     private List<String> recentChanges;
     private StringBuffer title;
-    //private SimpleDateFormat dF;
-
 
 
     public Note(String name, String content) {
