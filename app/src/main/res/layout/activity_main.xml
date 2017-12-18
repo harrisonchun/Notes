@@ -18,7 +18,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.964"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        app:srcCompat="@android:drawable/ic_menu_add"
+        android:backgroundTint="#00b2ff"/>
 
     <ListView
         android:id="@+id/listview_notes"
@@ -28,5 +29,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:divider="#00b2ff"
+        android:dividerHeight="2dp"
+        android:layout_weight="1"
+        android:background="#fff090"/>
+
+    <!--<ImageButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:contentDescription="@string/sort"-->
+        <!--android:onClick="showPopup"-->
+        <!--android:src="@drawable/ic_sort_black_24dp"-->
+        <!--tools:layout_editor_absoluteX="320dp"-->
+        <!--tools:layout_editor_absoluteY="0dp" />-->
 </android.support.constraint.ConstraintLayout>
