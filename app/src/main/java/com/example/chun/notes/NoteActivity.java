@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
@@ -37,13 +38,13 @@ public class NoteActivity extends AppCompatActivity{
         note = i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note name from intent
         note.setDateAccessed(new Date());
         nameText.setText(note.getName());
-        contentText.setText(note.getContent());
+        contentText.setText(SpannableString.valueOf(Html.fromHtml(note.getContent().toString())));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_options, menu);
+        inflater.inflate(R.menu.noteactivity_menu_options, menu);
         return true;
     }
 
@@ -73,13 +74,11 @@ public class NoteActivity extends AppCompatActivity{
     private void bold(){
         int startSelection = contentText.getSelectionStart();
         int endSelection = contentText.getSelectionEnd();
-        if (startSelection == endSelection) {contentText.setTypeface(Typeface.DEFAULT_BOLD);}
-        else{
         SpannableString contentString = SpannableString.valueOf(contentText.getText());
         contentString.setSpan(new StyleSpan(Typeface.BOLD), startSelection, endSelection, 0);
         contentText.setText(contentString);
-        contentText.setSelection(endSelection   );}
-    }
+        contentText.setSelection(startSelection, endSelection);}
+
 
     private void italic(){
         int startSelection = contentText.getSelectionStart();
@@ -87,7 +86,7 @@ public class NoteActivity extends AppCompatActivity{
         SpannableString contentString = SpannableString.valueOf(contentText.getText());
         contentString.setSpan(new StyleSpan(Typeface.ITALIC), startSelection, endSelection, 0);
         contentText.setText(contentString);
-        contentText.setSelection(endSelection   );
+        contentText.setSelection(startSelection, endSelection);
     }
 
     private void underline(){
@@ -96,12 +95,12 @@ public class NoteActivity extends AppCompatActivity{
         SpannableString contentString = SpannableString.valueOf(contentText.getText());
         contentString.setSpan(new UnderlineSpan(), startSelection, endSelection, 0);
         contentText.setText(contentString);
-        contentText.setSelection(endSelection   );
+        contentText.setSelection(startSelection, endSelection);
     }
 
     @Override
     protected void onPause() {
-        note.setContent(new StringBuffer(contentText.getText().toString()));
+        note.setContent(new StringBuffer(Html.toHtml(SpannableString.valueOf(contentText.getText()))));
         note.setName(new StringBuffer(nameText.getText().toString()));
         writeToFile(note,this);
         super.onPause();
@@ -109,7 +108,7 @@ public class NoteActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        note.setContent(new StringBuffer(contentText.getText().toString()));
+        note.setContent(new StringBuffer(Html.toHtml(SpannableString.valueOf(contentText.getText()))));
         note.setName(new StringBuffer(nameText.getText().toString()));
         Intent i = getIntent();
         if (nameText.getText().toString().length()>30){
