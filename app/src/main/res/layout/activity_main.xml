@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.964"
         app:srcCompat="@drawable/ic_menu_add"
-        app:backgroundTint="#00b2ff" />
+        app:backgroundTint="#ac582e" />
 
     <ListView
         android:id="@+id/listview_notes"
@@ -30,7 +30,6 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:divider="#00b2ff"
         android:dividerHeight="2dp"
         android:layout_weight="1"
         android:background="#fff090"/>
