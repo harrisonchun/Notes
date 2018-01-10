@@ -34,7 +34,7 @@ public class NoteActivity extends AppCompatActivity{
 
         wireWidgets();
 
-        Intent i = getIntent();//gets intent
+        Intent i = getIntent();
         note = i.getParcelableExtra(MainActivity.EXTRA_NOTE);//gets note name from intent
         note.setDateAccessed(new Date());
         nameText.setText(note.getName());
@@ -55,7 +55,6 @@ public class NoteActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.italics_button:
                 italic();

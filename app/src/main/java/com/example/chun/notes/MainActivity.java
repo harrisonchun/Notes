@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         notesTitles = readFromFile("stringdirectory_ja7abmy663g87dk.txt", this);
         Log.d(TAG, "onResume: titles in notesTitles" + notesTitles.toString());
-        //notesAdapter.clear();
         notesList.clear();
         Log.d(TAG, "onResume: notes list after clear " + notesList);
         fillNotesList();
@@ -190,12 +189,8 @@ public class MainActivity extends AppCompatActivity {
                 newNote = null;
             }
         }
-        //check if newNote is not null and add to the list, then set newNote back to null
         notesAdapter = new ArrayAdapter<Note>(this, android.R.layout.simple_list_item_1, notesList);
         notesListView.setAdapter(notesAdapter);
-//        notesAdapter.addAll(notesList);
-        // notesAdapter.notifyDataSetChanged();
-//        new LoadNotesTask().execute();
         Log.d(TAG, "onResume: " + notesList.toString());
         super.onResume();
     }
@@ -209,15 +204,10 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onActivityResult: titles in notesTitles[] " + n.getTitle().toString() + " " + notesTitles);
             if (!notesTitles.contains(n.getTitle().toString())) {
                 notesTitles.add(n.getTitle().toString());
-                //notesList.add(n);
                 newNote = n;
-                Log.d(TAG, "onActivityResult: noteslist contents " + notesList.toString());
-                //writeToFile(n,this);
-                //notesAdapter.notifyDataSetChanged();
-                //saveFileDirectory();
+                Log.d(TAG, "onActivityResult: notesList contents " + notesList.toString());
             }
         }
-        //super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void wireWidgets() {
@@ -272,10 +262,6 @@ public class MainActivity extends AppCompatActivity {
         return notes;
     }
 
-//    public boolean fileExist(String fname){
-//        File file = getBaseContext().getFileStreamPath(fname);
-//        return file.exists();
-//    }
 
     public boolean fileExist(String fileName) {
         String path = getFilesDir().getAbsolutePath() + "/" + fileName;
